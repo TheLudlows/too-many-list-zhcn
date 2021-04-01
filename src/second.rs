@@ -34,6 +34,14 @@ impl<T> List<T> {
     }
 
     pub fn peek(&self) -> Option<&T> {
+
+       /* match &self.head {
+            None => {None}
+            Some(node) => {
+                Some(&node.elem)
+            }
+        }*/
+
         self.head.as_ref().map(|node| &node.elem)
     }
 }
