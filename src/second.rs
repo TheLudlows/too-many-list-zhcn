@@ -1,57 +1,52 @@
 use std::mem;
 
-struct Node {
-    elem: i32,
-    next: Link,
+struct Node<T> {
+    elem: T,
+    next: Link<T>,
 }
 
-enum Link {
-    Empty,
-    More(Box<Node>),
+type Link<T> = Option<Box<Node<T>>>;
+
+
+pub struct List<T> {
+    head: Link<T>,
 }
 
-pub struct List {
-    head: Link,
-}
-
-impl List {
+impl<T> List <T>{
     pub fn new() -> Self {
-        List { head: Link::Empty }
+        List { head: None }
     }
 
-    pub fn push(&mut self, v: i32) {
+    pub fn push(&mut self, v: T) {
+        let next = self.head.take();
         let node = Box::new(Node {
             elem: v,
-            next: mem::replace(&mut self.head, Link::Empty),
+            next,
         });
-        self.head = Link::More(node);
+        self.head = Some(node);
     }
 
-    pub fn pop(&mut self) -> Option<i32> {
-        match mem::replace(&mut self.head, Link::Empty) {
-            Link::Empty => {
-                None
-            }
-            Link::More(node) => {
-                let t = node.elem;
-                self.head = node.next;
-                Some(t)
-            }
-        }
+    pub fn pop(&mut self) -> Option<T> {
+        self.head.take().map(|node| {
+            self.head = node.next;
+            node.elem
+        })
     }
 }
 
-impl Drop for List {
+impl<T> Drop for List<T> {
     fn drop(&mut self) {
-        let mut cur = mem::replace(&mut self.head, Link::Empty);
-        while let Link::More(mut node)  = cur {
-            cur = mem::replace(&mut node.next, Link::Empty)
+        let mut cur = self.head.take();
+        while let Some(mut node) = cur {
+            cur = node.next.take()
         }
     }
 }
+
 #[cfg(test)]
-mod test{
+mod test {
     use super::List;
+
     #[test]
     fn basics() {
         let mut list = List::new();
