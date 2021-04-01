@@ -44,14 +44,16 @@ impl List {
 impl Drop for List {
     fn drop(&mut self) {
         let mut cur = mem::replace(&mut self.head, Link::Empty);
-        while let Link::More(mut node)  = cur {
+        while let Link::More(mut node) = cur {
             cur = mem::replace(&mut node.next, Link::Empty)
         }
     }
 }
+
 #[cfg(test)]
-mod test{
+mod test {
     use super::List;
+
     #[test]
     fn basics() {
         let mut list = List::new();

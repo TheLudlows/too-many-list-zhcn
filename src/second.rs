@@ -12,7 +12,7 @@ pub struct List<T> {
     head: Link<T>,
 }
 
-impl<T> List <T>{
+impl<T> List<T> {
     pub fn new() -> Self {
         List { head: None }
     }
