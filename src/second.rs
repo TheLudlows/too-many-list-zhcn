@@ -34,17 +34,65 @@ impl<T> List<T> {
     }
 
     pub fn peek(&self) -> Option<&T> {
-
-       /* match &self.head {
-            None => {None}
-            Some(node) => {
+        match self.head {
+            None => { None }
+            Some(ref node) => {
                 Some(&node.elem)
             }
-        }*/
+        }
 
-        self.head.as_ref().map(|node| &node.elem)
+        // self.head.as_ref().map(|node| &node.elem)
+    }
+    pub fn peek_mut(&mut self) -> Option<&mut T> {
+        self.head.as_mut().map(|node| &mut node.elem)
+    }
+
+    pub fn into_iter(self) -> IntoIter<T> {
+        IntoIter(self)
+    }
+
+    pub fn iter(&self) -> Iter<T> {
+        Iter { cur: self.head.as_ref().map(|node| &node) }
     }
 }
+
+pub struct Iter<T> {
+    cur :  Option<& Node<T>>,
+}
+impl<T> Iterator for Iter<T> {
+    type Item = &T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        todo!()
+    }
+}
+
+pub struct IntoIter<T>(List<T>);
+
+impl<T> Iterator for IntoIter<T> {
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.pop()
+    }
+}
+/*pub struct Iter<'a, T> {
+    cur: Option<&'a Node<T>>
+}
+
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.cur {
+            Some(node) => {
+                let r = Some(&node.elem);
+                self.cur = node.next.as_ref().map(|node| node.as_ref());
+                r
+            },
+            None => None
+        }
+    }
+}*/
 
 impl<T> Drop for List<T> {
     fn drop(&mut self) {
@@ -90,6 +138,29 @@ mod test {
         assert_eq!(list.peek(), None);
 
         list.push(1);
-        assert_eq!(list.peek(), Some(&1))
+        assert_eq!(list.peek(), Some(&1));
+
+        let mut ref_node = list.peek_mut().map(|i| *i = 10);
+        println!("{:?}", list.peek());
+
+        for i in list.into_iter() {
+            println!("{:?}", i);
+        }
+        let mut v = List::new();
+        v.push(1);
+
+        for i in v.iter() {
+            println!("{:?}", i);
+        }
     }
+
+    #[test]
+    fn test_option() {
+        let some = Some(1);
+        println!("{:p}", &some);
+        println!("{:p}", some.as_ref().unwrap());
+    }
+
+    #[test]
+    fn test_mut() {}
 }
