@@ -72,16 +72,35 @@ impl<'a, T> Iterator for Iter<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.cur {
+        self.cur.map(|node| {
+            self.cur = node.next.as_deref();
+            & node.elem
+        })
+        /*match self.cur {
             Some(node) => {
                 let r = Some(&node.elem);
                 self.cur = node.next.as_deref();
                 r
             },
             None => None
-        }
+        }*/
     }
 }
+
+struct IterMut<'a, T> {
+    cur: Option<&'a mut Node<T>>
+}
+impl<'a, T> Iterator for IterMut<'a, T> {
+    type Item = &'a mut T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.cur.map(|node| {
+            self.cur = node.next.as_deref_mut();
+            &mut node.elem
+        })
+    }
+}
+
 
 impl<T> Drop for List<T> {
     fn drop(&mut self) {
