@@ -1,5 +1,3 @@
-use std::mem;
-
 struct Node<T> {
     elem: T,
     next: Link<T>,
@@ -52,18 +50,9 @@ impl<T> List<T> {
     }
 
     pub fn iter(&self) -> Iter<T> {
-        Iter { cur: self.head.as_ref().map(|node| &node) }
-    }
-}
+        //Iter { cur: self.head.as_ref().map(|node| &**node) }
+        Iter { cur: self.head.as_deref() }
 
-pub struct Iter<T> {
-    cur :  Option<& Node<T>>,
-}
-impl<T> Iterator for Iter<T> {
-    type Item = &T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        todo!()
     }
 }
 
@@ -75,7 +64,7 @@ impl<T> Iterator for IntoIter<T> {
         self.0.pop()
     }
 }
-/*pub struct Iter<'a, T> {
+pub struct Iter<'a, T> {
     cur: Option<&'a Node<T>>
 }
 
@@ -86,13 +75,13 @@ impl<'a, T> Iterator for Iter<'a, T> {
         match self.cur {
             Some(node) => {
                 let r = Some(&node.elem);
-                self.cur = node.next.as_ref().map(|node| node.as_ref());
+                self.cur = node.next.as_deref();
                 r
             },
             None => None
         }
     }
-}*/
+}
 
 impl<T> Drop for List<T> {
     fn drop(&mut self) {
@@ -140,7 +129,7 @@ mod test {
         list.push(1);
         assert_eq!(list.peek(), Some(&1));
 
-        let mut ref_node = list.peek_mut().map(|i| *i = 10);
+        let mut _node = list.peek_mut().map(|i| *i = 10);
         println!("{:?}", list.peek());
 
         for i in list.into_iter() {
