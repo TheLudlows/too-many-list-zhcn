@@ -46,6 +46,20 @@ impl<T> List<T> {
         self.head = Some(new_node);
     }
 
+    pub fn push_back(&mut self, elem: T) {
+        let mut new_node = Node::new(elem);
+        match self.tail.take() {
+            None => {
+                self.head = Some(new_node.clone());
+            },
+            Some(mut old_tail) => {
+                old_tail.borrow_mut().next = Some(new_node.clone());
+                new_node.borrow_mut().pre = Some(old_tail);
+            }
+        }
+        self.tail = Some(new_node);
+    }
+
     pub fn pop_front(&mut self) -> Option<T> {
         match self.head.take() {
             None => None,
@@ -57,6 +71,24 @@ impl<T> List<T> {
                     Some(next_node) => {
                         next_node.borrow_mut().pre.take();
                         self.head = Some(next_node);
+                    }
+                }
+                Some(Rc::try_unwrap(node).ok().unwrap().into_inner().elem)
+            }
+        }
+    }
+
+    pub fn pop_back(&mut self) -> Option<T> {
+        match self.tail.take() {
+            None => None,
+            Some(mut node) => {
+                match node.borrow_mut().pre.take() {
+                    None => {
+                        self.head = None;
+                    }
+                    Some(pre) => {
+                        pre.borrow_mut().next.take();
+                        self.tail = Some(pre);
                     }
                 }
                 Some(Rc::try_unwrap(node).ok().unwrap().into_inner().elem)
