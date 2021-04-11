@@ -101,6 +101,12 @@ impl<T> List<T> {
            Ref::map(node.borrow(), |ref_node|  &ref_node.elem)
         )
     }
+
+    pub  fn peek_back(&self) -> Option<Ref<T>> {
+        self.tail.as_ref().map(|node|
+            Ref::map(node.borrow(), |ref_node|  &ref_node.elem)
+        )
+    }
 }
 
 impl<T> Drop for List<T> {
