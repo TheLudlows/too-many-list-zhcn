@@ -22,7 +22,6 @@ impl<T> List<T> {
             elem,
             next: None,
         });
-
         let raw_p: *mut _ = new_node.as_mut() as *mut _;
         unsafe {
             if self.tail.is_null() {
